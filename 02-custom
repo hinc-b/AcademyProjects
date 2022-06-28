@@ -1,10 +1,19 @@
 #!/bin/sh
 echo "GENERAL SYSTEM INFORMATION"
-/usr/bin/screenfetch
+/usr/bin/screenfetch1 
 echo
+
 echo "SYSTEM DISK USAGE"
 export TERM=xterm; inxi -D
 echo
+echo
 echo "CURRENT WEATHER AT THE LOCATION"
 # Show weather information. Change the city name
+
 ansiweather -l Warsaw
+echo
+echo
+
+
+
+
