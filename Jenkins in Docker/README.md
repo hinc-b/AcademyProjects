@@ -14,25 +14,26 @@ Make sure you have already installed both Docker Engine.
 ## Dockerfile
 The image contains:
 ```
-FROM openjdk:8
-
-#Updates exisiting packages. Tools
-RUN apt-get update -qq && apt-get install -qq curl git nano && apt-get clean
+FFROM openjdk:11
 
 #Environmental variables
 ENV JENKINS_HOME /opt/jenkins
-ENV JENKINS_MIRROR http://mirrors.jenkins-ci.org
+ENV JENKINS-USER admin
+ENV JENKINS_PASSWD password
 ENV CASC_JENKINS_CONFIG /var/jenkins_home/casc.yaml
 ##immediately shown the dashboard without the setup wizard
 ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
 
-#Installs Jenkins
-RUN mkdir -p $JENKINS_HOME
-ADD https://get.jenkins.io/war-stable/2.346.1/jenkins.war $JENKINS_HOME/jenkins.war
-
-#Installs plugins
-RUN mkdir -p $JENKINS_HOME/plugins; for plugin in ec2 s3 aws-java-sdk-iam configuration-as-code; \
-  do curl -sf -o $JENKINS_HOME/plugins/${plugin}.hpi -L $JENKINS_MIRROR/plugins/${plugin}/latest/${plugin}.hpi; done
+#Installs plugins and jenkins and updates existing packages
+ADD https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.12.8/jenkins-plugin-manager-2.12.8.jar /usr/share/jenkins/ref/jenkins-plugin-manager.jar
+RUN curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null \
+&& echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+https://pkg.jenkins.io/debian-stable binary/ | tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null \
+&& apt-get update \
+&& apt-get install -y jenkins
+COPY jenkins-plugins.txt /usr/share/jenkins/ref/plugins.txt
 
 #Configuration file - adds user
 COPY casc.yaml /var/jenkins_home/casc.yaml
@@ -42,17 +43,19 @@ VOLUME $JENKINS_HOME/data
 WORKDIR $JENKINS_HOME
 
 EXPOSE 8080
-CMD [ "java", "-jar", "jenkins.war" ]
+RUN java -jar /usr/share/jenkins/ref/jenkins-plugin-manager.jar -d /opt/jenkins/plugins --war /usr/share/java/jenkins.war --plugin-file /usr/share/jenkins/ref/plugins.txt
+CMD ["jenkins"]
 ```
 
 This tells Docker to:
-- Build an image starting with the Java openjdk:8 image.
-- Updates exisiting packages.
+- Build an image starting with the Java openjdk:11 image
 - Adds environmental variables
-- Installs Jenkins from .war file.
-- Installs required plugins.
-- Copy casc.yaml file with configuration, that adds user - admin.
-- Mounts volume and set the working directory to /app.
+- Adds jenkins plugin manager
+- Installs Jenkins
+- Installs required plugins
+- Copy plugins
+- Copy casc.yaml file with configuration, that adds user - admin
+- Mounts volume and set the working directory to /data
 - Add metadata to the image to describe that the container is listening on port 8000
 - Set the default command for the container to run jenkins.
 
@@ -75,13 +78,7 @@ docker run -itd -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock --name
 
 4. Enter http://localhost:8000/ in a browser to see the jenkins running.
 
-5. Enter your container and find password to unlock jenkins:
-```
-docker exec -it container_id bash
-```
-Then copy contents of /opt/jenkins/secrets/initialAdminPassword and paste it.
-
-6. Everything should works now. If you want to log in once again, please use password from InitialAdminPassword and admin as a UserId.
+5. Everything should works now. If you want to log in once again, please use password from InitialAdminPassword and admin as a UserId.
 
 ## Authors
 * **Blazej Hinc**
