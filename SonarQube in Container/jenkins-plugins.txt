@@ -1,0 +1,4 @@
+ec2:1.68
+s3:0.12.1
+aws-java-sdk-iam:1.12.246-349.v96b_b_f7eb_a_c3c
+configuration-as-code:1466.v2d4119502006
