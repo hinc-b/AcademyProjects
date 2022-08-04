@@ -1,0 +1,36 @@
+---
+- apt_repository: repo='ppa:nginx/stable' state=present
+
+- name: Install nginx
+  apt: name=nginx state=latest
+
+- name: Copy nginx configuration for wordpress
+  template: src=wordpress dest=/etc/nginx/sites-available/wordpress force=no
+  notify: restart nginx
+
+- name: Copy nginx ssl configuration for wordpress
+  template: src=wordpress-ssl dest=/etc/nginx/sites-available/wordpress-ssl force=no
+  notify: restart nginx
+
+- name: Copy nginx general configuration
+  template: src=nginx.conf dest=/etc/nginx/nginx.conf
+  notify: restart nginx
+
+- name: Create symlink for wordpress configuration
+  file: src=/etc/nginx/sites-available/wordpress dest=/etc/nginx/sites-enabled/wordpress state=link
+  notify: reload nginx
+
+- name: Delete default
+  file: path=/etc/nginx/sites-enabled/default state=absent
+  notify: reload nginx
+
+- name: Make sure 'nginx' is started
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
+  register: result
+
+- name: Show result
+  debug:
+    msg: "{{ result }}"

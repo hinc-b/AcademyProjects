@@ -1,0 +1,53 @@
+---
+- name: Install MySQL
+  apt: name={{ item }}
+  with_items:
+    - mysql-client
+    - mysql-server
+    - python3-pymysql
+  tags: [ db ]
+
+- name: Ensure MySQL is running and starts on boot
+  service: name=mysql state=started enabled=true
+  tags: [ db ]
+
+#For idempotency
+- name: Set mysql_root_password
+  mysql_user:
+    name: root
+    password: "{{ mysql_root_password }}"
+    login_unix_socket: "/var/run/mysqld/mysqld.sock"
+    host: localhost
+  ignore_errors: yes
+  tags: [ db ]
+
+# Mam stale problem z ERROREM
+# fatal: [10.100.198.189]: FAILED! => {"changed": false, "msg": "unable to connect to database, check login_user and login_password are correct or /# root/.my.cnf has the credentials. Exception message: (1045, \"Access denied for user 'root'@'localhost' (using 
+# password: NO)\")"}
+
+# Probowalem wielu rzeczy, ale na ten moment nie potrafie przejsc tego kroku dalej 
+# Co jak rozumiem, uniemozliwia mi usuniecie Anonymous Usera, Testowej Bazy Danych oraz stworzenie nowej Bazdy Danych oraz Uzytkownika Wordpress
+
+
+
+#- name: Copy .my.cnf file with root password credentials
+#  template: src=templates/.my.cnf.j2 dest=~/.my.cnf owner=root mode=0600
+#  tags: [ db ]
+
+#- name: Removes all anonymous user accounts
+#  mysql_user: name='' host=localhost state=absent login_user=root login_password= "{{ mysql_root_password }}"
+#  tags: [ db ]
+
+#- name: Removes the MySQL test database
+#  mysql_db: name=test state=absent login_user=root login_password= "{{ mysql_root_password }}"
+#  tags: [ db ]
+#
+#- name: Creates wordpress DB with the Root user
+#  mysql_db: name=TestDB state=present login_user=root login_password= "{{ mysql_root_password }}"
+#  ignore_errors: yes
+#  tags: [ db ]
+#
+#- name: Create wordpress user and gim him all priveleges on wordpress DB
+#  mysql_user: name=WPtestuser host=localhost password="pwd_12345" state=present priv=WPtestuser.*:ALL login_user=root login_password= "{{ mysql_root_password }}"
+#  ignore_errors: yes
+#  tags: [ db ]

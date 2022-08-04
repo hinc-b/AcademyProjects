@@ -1,0 +1,11 @@
+---
+- name: Wordpress & LEMP server
+  hosts: vagrantboxes
+  gather_facts: yes
+  become: yes
+
+  roles:
+    - common
+    - nginx
+    - db
+    - wordpress

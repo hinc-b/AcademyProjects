@@ -1,0 +1,11 @@
+---
+ - name: apt-get update
+   shell: apt-get update
+   tags: [ common ]
+
+ - name: Install Prerequisites
+   apt: name={{ item }} update_cache=yes state=latest
+   with_items:
+     - python-pip
+     - python-dev
+   tags: [ common ]
