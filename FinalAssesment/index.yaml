@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  app:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2022-08-23T15:37:10.540759726Z"
+    description: Python app for final assesment | DevOps Academy @ EPAM
+    digest: 9d0cda46bf77a4ece172441a0c2e90442b87c8a40016846b814f8ff29b69e85e
+    name: app
+    type: application
+    urls:
+    - s3://bucket-us-east-1-prod-repo/stable/app/app-0.1.0.tgz
+    version: 0.1.0
+generated: "2022-08-23T15:29:10.039390149Z"
