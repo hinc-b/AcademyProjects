@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+#Script that will print the name of the highest-paid employee
+cat $1 | cut -d ',' -f1-2 > highest-paid-employee.csv
+
+sort -nk1 $2 > salaries-sorted.csv
+
+#Paste the highest-paid-employee.csv, then cut and paste the second column to the next (-f2-) from file salaries-sorted.csv
+paste -d, highest-paid-employee.csv <(cut -d, -f2- salaries-sorted.csv) > hpe.csv
+
+#Highest-paid employee
+head -2 hpe.csv
