@@ -1,8 +1,0 @@
-/usr/local/gzbackup/backup.log	{
-	daily
-	rotate 10
-	compress
-	delaycompress
-	ifempty
-	copytruncate
-}
