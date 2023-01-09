@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+#Write a script that will print the sum of the salaries of all employees above a certain age
+#given as a command-line arg, eg: ./sum.sh 30 employees.csv salaries.csv
+
+
+#cut columns EMP_ID, NAME & AGE from employees.csv
+cat $2 | cut -d ',' -f1-3 > emp.csv
+
+#sort salaries.csv by EMP_ID
+sort -nk1 $3 > ss.csv
+
+#Paste the empe.csv, then cut and paste the second column to the next (-f2-) from file ss.csv
+paste -d, emp.csv <(cut -d, -f2- ss.csv) > hpe.csv
+
+##
+
+sum=0
+while IFS=",", read -a fields; do
+  if [[ ${fields[2]} > $1 ]]; then
+    (( sum += fields[2] ))
+  fi
+done < hpe.csv
+
+printf 'sum: %d\n' "$sum"
