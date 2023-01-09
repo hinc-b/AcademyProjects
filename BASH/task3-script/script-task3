@@ -23,3 +23,6 @@ while IFS=",", read -a fields; do
 done < hpe.csv
 
 printf 'sum: %d\n' "$sum"
+
+#Doesnt work properly, as it shows the sum of AGE column.
+#I tried to put in line 21 (( sum += fields[3] )) but then it only shows the first value from SALARY column
